@@ -270,6 +270,69 @@ def draw_riptide(ax,x,u,α):
     ax.plot(M[0],M[1],1*M[2],color='orange')
     ax.plot(M[0],M[1],0*M[2],color='grey')
     pause(0.001)
+    
+    
+def draw_sphere3D(r) :
+    theta = np.linspace(0, 2 * np.pi, 201)
+    y = r*np.cos(theta)
+    z = r*np.sin(theta)
+
+    W=[y*0,y*0,y*0]
+
+    for i in range(18):
+        phi = i*pi/9
+        circle =[y*sin(phi),y*cos(phi),z]
+        W=hstack((W,circle))
+
+    return add1(array(W))
+
+def draw_RUR(ax,x,u,α):
+    u=u.flatten()
+    R=eulerH(*x[3:6,0])
+    T=tran3H(*x[0:3,0])
+    Ca=hstack((circle3H(1.5), [[1.5, -1.5], [0, 0], [0, 0], [1, 1]])) # the disc + the blades
+    
+    #Corps du robot
+    M=T@R @ cylinder3H(1,10)
+    ax.plot(M[0],M[1],1*M[2],color='orange')
+    ax.plot(M[0],M[1],0*M[2],color='grey')
+
+    #tête du robot
+    sphere = tran3H(10,0,0)@draw_sphere3D(1)
+    SPH = T@R@sphere
+    ax.plot(SPH[0],SPH[1],SPH[2],color='orange')
+
+    #propulseur arrière
+    P1 = tran3H(0,0,1)@rot3H(0, pi/2, 0)@cylinder3H(0.5,2)
+    M1 = T@R@P1
+    ax.plot(M1[0],M1[1],1*M1[2],color='blue')
+    ax.plot(M1[0],M1[1],0*M1[2],color='grey')
+
+    #hélice arrière
+    H1=tran3H(0,0,1)@eulerH(0,0,α)@Ca  # we rotate the blades
+    draw3H(ax,T@R@H1,'red')
+
+    #propulseur gauche
+    P1 = tran3H(4,2,0)@cylinder3H(0.5,2)
+    M1 = T@R@P1
+    ax.plot(M1[0],M1[1],1*M1[2],color='blue')
+    ax.plot(M1[0],M1[1],0*M1[2],color='grey')
+
+    #hélice gauche
+    H1=tran3H(4,2,0)@eulerH(0,pi/2,0)@eulerH(0,0,α)@Ca  # we rotate the blades
+    draw3H(ax,T@R@H1,'red')
+
+    #propulseur droit
+    P1 = tran3H(4,-2,0)@cylinder3H(0.5,2)
+    M1 = T@R@P1
+    ax.plot(M1[0],M1[1],1*M1[2],color='blue')
+    ax.plot(M1[0],M1[1],0*M1[2],color='grey')
+
+    #hélice droite
+    H1=tran3H(4,-2,0)@eulerH(0,pi/2,0)@eulerH(0,0,α)@Ca  # we rotate the blades
+    draw3H(ax,T@R@H1,'red')
+
+    pause(0.001)
 
     
 def plot2D(M,col='black',w=1):
