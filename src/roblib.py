@@ -286,11 +286,11 @@ def draw_sphere3D(r) :
 
     return add1(array(W))
 
-def draw_RUR(ax,x,u,α):
+def draw_RUR(ax,x,u,α,theta_arr,theta_d,theta_g):
     u=u.flatten()
     R=eulerH(*x[3:6,0])
     T=tran3H(*x[0:3,0])
-    Ca=hstack((circle3H(1.5), [[1.5, -1.5], [0, 0], [0, 0], [1, 1]])) # the disc + the blades
+    Ca=hstack((circle3H(1), [[1, -1], [0, 0], [0, 0], [1, 1]])) # the disc + the blades
     
     #Corps du robot
     M=T@R @ cylinder3H(1,10)
@@ -303,37 +303,36 @@ def draw_RUR(ax,x,u,α):
     ax.plot(SPH[0],SPH[1],SPH[2],color='orange')
 
     #propulseur arrière
-    P1 = tran3H(0,0,1)@rot3H(0, pi/2, 0)@cylinder3H(0.5,2)
+    P1 = rot3H(0, pi/2, 0)@eulerH(0,0,theta_arr)@cylinder3H(0.5,2)
     M1 = T@R@P1
     ax.plot(M1[0],M1[1],1*M1[2],color='blue')
     ax.plot(M1[0],M1[1],0*M1[2],color='grey')
 
     #hélice arrière
-    H1=tran3H(0,0,1)@eulerH(0,0,α)@Ca  # we rotate the blades
+    H1 = rot3H(theta_arr, pi, 0)@eulerH(0,0,α)@Ca  # we rotate the blades
     draw3H(ax,T@R@H1,'red')
 
     #propulseur gauche
-    P1 = tran3H(4,2,0)@cylinder3H(0.5,2)
+    P1 = tran3H(4,2,0)@rot3H(0, theta_g, 0)@cylinder3H(0.5,2)
     M1 = T@R@P1
-    ax.plot(M1[0],M1[1],1*M1[2],color='blue')
+    ax.plot(M1[0],M1[1],1*M1[2],color='green')
     ax.plot(M1[0],M1[1],0*M1[2],color='grey')
 
     #hélice gauche
-    H1=tran3H(4,2,0)@eulerH(0,pi/2,0)@eulerH(0,0,α)@Ca  # we rotate the blades
+    H1 = tran3H(4,2,0)@rot3H(0, theta_g + pi/2, 0)@eulerH(0,0,α)@Ca  # we rotate the blades
     draw3H(ax,T@R@H1,'red')
 
     #propulseur droit
-    P1 = tran3H(4,-2,0)@cylinder3H(0.5,2)
+    P1 = tran3H(4,-2,0)@rot3H(0, theta_d, 0)@cylinder3H(0.5,2)
     M1 = T@R@P1
-    ax.plot(M1[0],M1[1],1*M1[2],color='blue')
+    ax.plot(M1[0],M1[1],1*M1[2],color='purple')
     ax.plot(M1[0],M1[1],0*M1[2],color='grey')
 
     #hélice droite
-    H1=tran3H(4,-2,0)@eulerH(0,pi/2,0)@eulerH(0,0,α)@Ca  # we rotate the blades
+    H1=tran3H(4,-2,0)@rot3H(0, theta_d + pi/2, 0)@eulerH(0,0,α)@Ca  # we rotate the blades
     draw3H(ax,T@R@H1,'red')
 
     pause(0.001)
-
     
 def plot2D(M,col='black',w=1):
     plot(M[0, :], M[1, :], col, linewidth = w)         
