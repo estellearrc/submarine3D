@@ -310,10 +310,9 @@ def draw_sphere3D(r) :
 
     return add1(array(W))
 
-def draw_RUR(ax,x,u,α,theta_arr,theta_d,theta_g):
-    u=u.flatten()
-    R=eulerH(*x[3:6,0])
-    T=tran3H(*x[0:3,0])
+def draw_RUR(ax,R,p,α,theta_arr,theta_d,theta_g):
+
+    T=tran3H(*p)
     Ca=hstack((circle3H(1), [[1, -1], [0, 0], [0, 0], [1, 1]])) # the disc + the blades
     
     #Corps du robot
