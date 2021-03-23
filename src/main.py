@@ -96,7 +96,8 @@ N = D.shape[1]
 # orientation of the torques
 Rτ = hstack((adjoint(Q[:, i]) @ D[:, i].reshape(3, 1) for i in range(0, N)))
 # concentrator
-C = vstack((D, Rτ))
+C = vstack((D, Q))
+print(C)
 
 
 p = array([[10], [0], [-20]])  # x,y,z (front,right,down)

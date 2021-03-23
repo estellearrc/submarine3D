@@ -91,11 +91,6 @@ def adjoint(w):
     return array([[0, -w[2], w[1]], [w[2], 0, -w[0]], [-w[1], w[0], 0]])
 
 
-def adjoint(w):
-    w = w.flatten()
-    return array([[0, -w[2], w[1]], [w[2], 0, -w[0]], [-w[1], w[0], 0]])
-
-
 def adjoint_inv(A):
     return array([[A[2, 1]], [A[0, 2]], [A[1, 0]]])
 
@@ -165,6 +160,7 @@ def rot3H(wx, wy, wz):
 
 
 def rot3H(wx, wy, wz): return ToH(expw([wx, wy, wz]))
+
 
 """
 def eulerH(φ, θ, ψ):
@@ -340,6 +336,7 @@ def draw_sphere3D(r):
 def draw_RUR(ax, R, p, α, theta_arr, theta_d, theta_g):
 
     T = tran3H(*p)
+    R = ToH(R)
     # the disc + the blades
     Ca = hstack((circle3H(1), [[1, -1], [0, 0], [0, 0], [1, 1]]))
 
