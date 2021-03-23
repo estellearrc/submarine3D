@@ -22,7 +22,7 @@ def draw_scene3D(ax, p, R, α, f):
     theta_rear = arctan2(f[5], f[4])
     theta_right = arctan2(f[3], f[2])
     theta_left = arctan2(f[1], f[0])
-    draw_RUR(ax, p, α, theta_rear, theta_right, theta_left)
+    draw_RUR(ax, R, p, α, theta_rear, theta_right, theta_left)
 
 
 def pd(t): return array([[sin(0.3*t)], [cos(0.4*t)], [-10+0.1*sin(0.3*t)]])

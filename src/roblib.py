@@ -7,11 +7,12 @@
 
 import numpy as np
 import matplotlib.pyplot as plt
-from numpy import mean, pi, cos, sin, sqrt, tan, arctan, arctan2, tanh, arcsin, arccos,\
+from numpy import mean, pi, cos, sin, sinc, sqrt, tan, arctan, arctan2, tanh, arcsin, arccos,\
     exp, dot, array, log, inf, eye, zeros, ones, inf, size,\
     arange, reshape, vstack, hstack, diag, median,\
-    sign, sum, meshgrid, cross, linspace, append, round, trace
+    sign, sum, meshgrid, cross, linspace, append, round, trace, rint
 from matplotlib.pyplot import *
+from matplotlib.cbook import flatten
 from numpy.random import randn, rand
 from numpy.linalg import inv, det, norm, eig, qr
 from scipy.linalg import sqrtm, expm, logm, norm, block_diag
@@ -27,18 +28,27 @@ from matplotlib.collections import PatchCollection
 # αβδεθλΛμρτφψωΓ
 
 
+"""    
+def eulermatold(φ,θ,ψ):
+    Ad_i = adjoint(array([1,0,0]))
+    Ad_j = adjoint(array([0,1,0]))
+    Ad_k = adjoint(array([0,0,1]))
+    return (expm(ψ*Ad_k) @ expm(θ*Ad_j) @ expm(φ*Ad_i))
+"""
+
+
 def eulermat(φ, θ, ψ):
-    Ad_i = adjoint(array([1, 0, 0]))
-    Ad_j = adjoint(array([0, 1, 0]))
-    Ad_k = adjoint(array([0, 0, 1]))
-    M = expm(ψ*Ad_k) @ expm(θ*Ad_j) @ expm(φ*Ad_i)
-    return(M)
+    return expw([0, 0, ψ]) @ expw([0, θ, 0]) @ expw([φ, 0, 0])
 
 
-def rot2w(R):
-    a = arccos((trace(R)-1)/2)
-    w = (1/(2*sin(a)))*adjoint_inv(R-R.T)
-    return a*w
+def eulermat2angles(R):
+    φ = arctan2(R[2, 1], R[2, 2])
+    θ = -arcsin(R[2, 0])
+    ψ = arctan2(R[1, 0], R[0, 0])
+    return φ, θ, ψ
+
+
+def rot2w(R): return adjoint_inv(logm(R))
 
 
 def eulerderivative(φ, θ, ψ):
@@ -63,12 +73,22 @@ def angle3d(u, v):
         vy = (1/norm(z))*(v.T)@z
         θ = arctan2(vy, vx)
         wn = (1/norm(w))*w
+        wn = (1/norm(w))*w
         R = expm(θ*adjoint(wn))  # rotation to go from u to v
     return θ, R
 
 
 def add1(M):
+    M = array(M)
     return vstack((M, ones(M.shape[1])))
+
+
+def tolist(w): return list(flatten(w))
+
+
+def adjoint(w):
+    w = tolist(w)
+    return array([[0, -w[2], w[1]], [w[2], 0, -w[0]], [-w[1], w[0], 0]])
 
 
 def adjoint(w):
@@ -78,6 +98,11 @@ def adjoint(w):
 
 def adjoint_inv(A):
     return array([[A[2, 1]], [A[0, 2]], [A[1, 0]]])
+
+
+def expw(w): return expm(adjoint(w))
+def expwH(w): return ToH(expw(w))
+def logw(R): return adjoint_inv(logm(R))
 
 
 def Rlatlong(lx, ly):
@@ -130,24 +155,29 @@ def ToH(R):  # transformation matrix to homogenous
 
 
 def tran3H(x, y, z):
-    return array([[1, 0, 0, x], [0, 1, 0, y], [0, 0, 1, z], [0, 0, 0, 1]])
+    return array([[1, 0, 0, float(x)], [0, 1, 0, float(y)], [0, 0, 1, float(z)], [0, 0, 0, 1]])
 
 
+"""
 def rot3H(wx, wy, wz):
     return ToH(expm(adjoint(array([[wx], [wy], [wz]]))))
+"""
 
 
+def rot3H(wx, wy, wz): return ToH(expw([wx, wy, wz]))
+
+"""
 def eulerH(φ, θ, ψ):
     Ad_i = adjoint(array([1, 0, 0]))
     Ad_j = adjoint(array([0, 1, 0]))
     Ad_k = adjoint(array([0, 0, 1]))
     M = expm(ψ * Ad_k) @ expm(θ * Ad_j) @ expm(φ * Ad_i)
     return ToH(M)
+"""
 
 
-def adjoint(w):
-    w = w.flatten()
-    return array([[0, -w[2], w[1]], [w[2], 0, -w[0]], [-w[1], w[0], 0]])
+def eulerH(φ, θ, ψ):
+    return ToH(expw([0, 0, ψ]) @ expw([0, θ, 0]) @ expw([φ, 0, 0]))
 
 
 def draw3H(ax, M, col, shadow=False, mirror=1):  # mirror=-1 in case z in directed downward
@@ -175,7 +205,7 @@ def wheel3H(r):
 
 
 def circle3H(r):
-    n = 10
+    n = 20
     θ = linspace(0, 2 * pi, n)
     x = r * cos(θ) + array(n * [0])
     y = r * sin(θ) + array(n * [0])
@@ -247,18 +277,10 @@ def axis3D(x1, x2, y1, y2, z1, z2):
     return ax
 
 
-def draw_axis3D(ax, x, y, z, R, zoom=1):
-    ax.scatter(x, y, z, color='magenta')
-    R = zoom*R
-    draw_arrow3D(ax, x, y, z, R[0, 0], R[1, 0], R[2, 0], "red")
-    draw_arrow3D(ax, x, y, z, R[0, 1], R[1, 1], R[2, 1], "green")
-    draw_arrow3D(ax, x, y, z, R[0, 2], R[1, 2], R[2, 2], "blue")
-
-
-def draw_quadrotor3D(ax, x, α, l):
+def draw_quadrotor3D(ax, p, R, α, l):
     # the disc + the blades
     Ca = hstack((circle3H(0.3*l), [[0.3*l, -0.3*l], [0, 0], [0, 0], [1, 1]]))
-    T = tran3H(*x[0:3]) @ eulerH(*x[3:6])
+    T = tran3H(*p) @ ToH(R)
     C0 = T @ tran3H(0, l, 0)@eulerH(0, 0, α[0])@Ca  # we rotate the blades
     C1 = T @ tran3H(-l, 0, 0) @ eulerH(0, 0, -α[1])@Ca
     C2 = T @ tran3H(0, -l, 0) @ eulerH(0, 0, α[2])@Ca
@@ -271,10 +293,10 @@ def draw_quadrotor3D(ax, x, α, l):
     draw3H(ax, C3, 'blue', True, -1)
 
 
-def draw_riptide(ax, x, u, α):
+def draw_riptide3D(ax, pos, R, u, α):
     u = u.flatten()
-    R = eulerH(*x[3:6, 0])
-    T = tran3H(*x[0:3, 0])
+    R = ToH(R)
+    T = tran3H(*pos[0:3, 0])
     flap = add1(
         array([[-1,  0, 0, -1, -1], [0,  0, 0,  0,  0], [0, 0, 1, 1, 0]]))
     flap1 = tran3H(0, 0, 1)@rot3H(0, 0, u[1])@flap
@@ -294,6 +316,12 @@ def draw_riptide(ax, x, u, α):
     pause(0.001)
 
 
+def draw_riptide(ax, x, u, α):  # obsolete
+    R = eulermat(*x[3:6, 0])
+    pos = array([[x[0, 0]], [x[1, 0]], [x[2, 0]]])
+    draw_riptide3D(ax, pos, R, u, α)
+
+
 def draw_sphere3D(r):
     theta = np.linspace(0, 2 * np.pi, 201)
     y = r*np.cos(theta)
@@ -309,9 +337,9 @@ def draw_sphere3D(r):
     return add1(array(W))
 
 
-def draw_RUR(ax, x, α, theta_arr, theta_d, theta_g):
-    R = eulerH(*x[3:6, 0])
-    T = tran3H(*x[0:3, 0])
+def draw_RUR(ax, R, p, α, theta_arr, theta_d, theta_g):
+
+    T = tran3H(*p)
     # the disc + the blades
     Ca = hstack((circle3H(1), [[1, -1], [0, 0], [0, 0], [1, 1]]))
 
@@ -374,34 +402,41 @@ def draw_segment(a, b, col='darkblue', w=1):
     # plot2D(b,'ro')
 
 
-def draw_ellipse(c, Γ, η, ax, col):  # Gaussian confidence ellipse with artist
-    # draw_ellipse(array([[1],[2]]),eye(2),0.9,ax,[1,0.8-0.3*i,0.8-0.3*i])
-    if (norm(Γ) == 0):
-        Γ = Γ+0.001*eye(len(Γ[1, :]))
-    A = sqrtm(-2*log(1-η)*Γ)
+# classical ellipse (x-c)T * invΓ * (x-c) <a^2
+def draw_ellipse0(ax, c, Γ, a, col, coledge='black'):
+    # draw_ellipse0(ax,array([[1],[2]]),eye(2),a,[0.5,0.6,0.7])
+    A = a * sqrtm(Γ)
     w, v = eig(A)
     v1 = array([[v[0, 0]], [v[1, 0]]])
     v2 = array([[v[0, 1]], [v[1, 1]]])
-
     f1 = A @ v1
     f2 = A @ v2
     φ = (arctan2(v1[1, 0], v1[0, 0]))
-    α = φ*180/3.14
-    e = Ellipse(xy=c, width=2*norm(f1), height=2*norm(f2), angle=α)
+    α = φ * 180 / 3.14
+    e = Ellipse(xy=c, width=2 * norm(f1), height=2 * norm(f2), angle=α)
     ax.add_artist(e)
     e.set_clip_box(ax.bbox)
 
     e.set_alpha(0.7)
     e.set_facecolor(col)
-    e.set_edgecolor("red")
+    e.set_edgecolor(coledge)
 
     # e.set_fill(False)
     # e.set_alpha(1)
     # e.set_edgecolor(col)
 
 
-def draw_disk(c, r, ax, col, alph=0.7, w=1):
-    # draw_disk(array([[1],[2]]),0.5,ax,"blue")
+# Gaussian confidence ellipse with artist
+def draw_ellipse_cov(ax, c, Γ, η, col, coledge='black'):
+    # draw_ellipse_cov(ax,array([[1],[2]]),eye(2),0.9,[0.5,0.6,0.7])
+    if (norm(Γ) == 0):
+        Γ = Γ+0.001*eye(len(Γ[1, :]))
+    a = sqrt(-2*log(1-η))
+    draw_ellipse0(ax, c, Γ, a, col, coledge)
+
+
+def draw_disk(ax, c, r, col, alph=0.7, w=1):
+    # draw_disk(ax,array([[1],[2]]),0.5,"blue")
     e = Ellipse(xy=c, width=2*r, height=2*r, angle=0, linewidth=w)
     ax.add_artist(e)
     e.set_clip_box(ax.bbox)
@@ -435,6 +470,23 @@ def draw_arc(c, a, θ, col):
     w = c@ones((1, size(s))) + r*array([[cos(alpha), -sin(alpha)],
                                         [sin(alpha), cos(alpha)]])@array([cos(s), sin(s)])
     plot2D(w, col, 3)
+
+
+def draw_pie(ax, c, ρ1, ρ2, θ1, θ2, col):
+    n = 12
+    W0 = array([[ρ1*np.cos(θ1)], [ρ1*np.sin(θ1)]])
+    W = W0
+    dθ = (θ2-θ1)/n
+    R = array([[np.cos(dθ), -np.sin(dθ)], [np.sin(dθ), np.cos(dθ)]])
+    for i in range(n + 1):
+        W0 = R @ W0
+        W = hstack((W, c+W0))
+    W0 = [[ρ2 * np.cos(θ2)], [ρ2 * np.sin(θ2)]]
+    R = array([[np.cos(dθ), np.sin(dθ)], [-np.sin(dθ), np.cos(dθ)]])
+    for i in range(n + 1):
+        W0 = R @ W0
+        W = hstack((W, c+W0))
+    draw_polygon(W.T, ax, col)
 
 
 def draw_arrow(x, y, θ, L, col):
@@ -573,10 +625,10 @@ def demo_draw():
 
     c = array([[-2], [-3]])
     G = array([[2, -1], [-1, 4]])
-    draw_ellipse(c, G, 0.9, ax, [0.8, 0.8, 1])
+    draw_ellipse_cov(ax, c, G, 0.9, [0.8, 0.8, 1])
     P = array([[5, -3], [9, -10], [7, -4], [7, -6]])
     draw_polygon(P, ax, 'green')
-    draw_disk(array([[-8], [-8]]), 2, ax, "blue")
+    draw_disk(ax, array([[-8], [-8]]), 2, "blue")
     draw_arc(array([[0], [5]]), array([[4], [6]]), 2, 'red')
     show()  # only at the end. Otherwize, it closes the figure in a terminal mode
 
@@ -625,7 +677,7 @@ def demo_animation():
         draw_car(array([[t], [2], [3+t], [4], [5+t]]), 'blue', 3)
         c = array([[-2+2*t], [-3]])
         G = array([[2+t, -1], [-1, 4+t]])
-        draw_ellipse(c, G, 0.9, ax, [0.8, 0.8, 1])
+        draw_ellipse_cov(ax, c, G, 0.9, [0.8, 0.8, 1])
 #        if (t>50)&(k%2000==0):
 #            fig.savefig('convoy'+str(k)+'.pdf', dpi=fig.dpi)
     show()
@@ -643,7 +695,7 @@ def demo_random():
     Xtilde = X - xbar @ ones((1, N))
     Γx_ = (Xtilde @ Xtilde.T)/N
     ax = init_figure(-20, 20, -20, 20)
-    draw_ellipse(xbar, Γx, 0.9, ax, [1, 0.8, 0.8])
+    draw_ellipse_cov(ax, xbar, Γx, 0.9, [1, 0.8, 0.8])
     pause(0.5)
     ax.scatter(*X)
     pause(1)
@@ -670,6 +722,22 @@ def projSO3(M):   # return a rotation matrix close to M
 if __name__ == "__main__":
 
     print('main program to test the functions of roblib.py')
+
+    R = eulermat(1, 2, 3)
+    D = diag((1, 2, 3))
+    A = R@D@R.T
+    print('A=', A)
+    #ax = Axes3D(figure())
+    #clean3D(ax, -10, 10, -10, 10,-10, 10)
+    #draw_axis3D(ax, 0, 0, 0, 3 * eye(3, 3))
+    #draw_robot3D(ax, array([[2],[3],[4]]), eye(3, 3), 'blue', 0.3)
+    # pause(1)
+
+    #φ, θ, ψ=-0.1,-0.2,-0.3
+    #R=eulermat(φ, θ, ψ)
+    # print(R)
+    #φ1, θ1, ψ1=eulermat2angles(R)
+    #print(φ1, θ1, ψ1)
 
     #     φ,θ,ψ=list(x[3:6])
     #    s,θ,ds,dθ =list(x[0:4,0])  #select the components of a vector
