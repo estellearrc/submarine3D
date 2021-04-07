@@ -19,9 +19,9 @@ dt = 0.05
 
 def draw_scene3D(ax, p, R, α, f):
     f = f.flatten()
-    theta_rear = arctan2(f[5], f[4])
-    theta_right = arctan2(f[3], f[2])
-    theta_left = arctan2(f[1], f[0])
+    theta_rear = -arctan2(f[5], f[4])
+    theta_right = -arctan2(f[3], f[2])
+    theta_left = -arctan2(f[1], f[0])
     draw_RUR(ax, R, p, α, theta_rear, theta_right, theta_left)
 
 
@@ -33,9 +33,11 @@ def dpd(t):
         [[0.3*cos(0.3*t)], [-0.4*sin(0.4*t)], [0.1*0.3*cos(0.3*t)]])
 
 
+
 def ddpd(t):
     return array([[-0.3*0.3*sin(0.3*t)],
                   [-0.4*0.4*cos(0.4*t)], [-0.1*0.3*0.3*sin(0.3*t)]])
+
 
 
 def Rd(t): return expw([[sin(t)], [cos(2*t)], [t]])
@@ -72,7 +74,7 @@ def clock_RUR(p, R, vr, wr, f):
     p = p+dt*R@vr
     R = R@expm(adjoint(dt*wr))
     vr = vr+dt*0.5*(-adjoint(wr)@vr+(R.T) @
-                    array([[0], [0], [g]]) + (l/m)*D@f - 0.5*Cx*Sx*rho*vr**2)
+                    array([[0], [0], [g*0]]) + (l/m)*D@f ) #- 0.5*Cx*Sx*rho*vr**2)
     wr = wr+dt*(inv(I)@(-adjoint(wr)@I@wr+Rτ@f))
     return p, R, vr, wr
 
@@ -100,19 +102,19 @@ C = vstack((D, Q))
 print(C)
 
 
-p = array([[10], [0], [-20]])  # x,y,z (front,right,down)
-R = eulermat(0.2, 0.3, 0.4)
+p = array([[0], [0], [5]])  # x,y,z (front,right,down)
+R = eulermat(0, 0, 0)
 vr = array([[0], [0], [0]])
 wr = array([[0], [0], [0]])
 α = zeros((N, 1))
 
 
 for t in arange(0, 10, dt):
-    # f = 0.1*array([[1], [1], [1], [1], [1], [1]])
-    f = control(t, p, R, vr, wr)
+    f = 0.1*array([[0], [0], [0], [0], [1], [0]])
+    #f = control(t, p, R, vr, wr)
     p, R, vr, wr = clock_RUR(p, R, vr, wr, f)
     clean3D(ax, -20, 20, -20, 20, 0, 25)
     draw_scene3D(ax, p, R, α, f)
-    α = α + dt * 30 * f
+    α = α + norm(f)
     pause(0.001)
 pause(10)

@@ -357,7 +357,7 @@ def draw_RUR(ax, R, p, α, theta_arr, theta_d, theta_g):
     ax.plot(M1[0], M1[1], 0*M1[2], color='grey')
 
     # hélice arrière
-    H1 = rot3H(theta_arr, pi, 0)@eulerH(0, 0, α)@Ca  # we rotate the blades
+    H1 = eulerH(theta_arr,0, 0)@eulerH(0, 0, α)@Ca  # we rotate the blades
     draw3H(ax, T@R@H1, 'red')
 
     # propulseur gauche
