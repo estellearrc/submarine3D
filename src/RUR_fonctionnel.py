@@ -30,17 +30,20 @@ def draw_scene3D(ax, p, R, α, f):
 
 def pd(t):
     # return 20*array([[sin(t)], [sin(2*t)], [1 + 0.1*sin(0.3*t)]])
-    return array([[10+20*cos(t)], [10+20*sin(t)], [0]])
+    # return array([[10+20*cos(t)], [10+20*sin(t)], [0]])
+    return array([[10+10*cos(t)], [10*sin(t)], [2*10*sin(0.5*t)]])
 
 
 def dpd(t):
     # return 20*array([[cos(t)], [2*cos(2*t)], [0.03*cos(0.3*t)]])
-    return 20*array([[-sin(t)], [cos(t)], [0]])
+    # return 20*array([[-sin(t)], [cos(t)], [0]])
+    return array([[-10*sin(t)], [10*cos(t)], [10*cos(0.5*t)]])
 
 
 def ddpd(t):
     # return 20*array([[-sin(t)], [-4*sin(2*t)], [-0.009*sin(0.3*t)]])
-    return 20*array([[-cos(t)], [-sin(t)], [0]])
+    # return 20*array([[-cos(t)], [-sin(t)], [0]])
+    return array([[-10*cos(t)], [-10*sin(t)], [-5*sin(0.5*t)]])
 
 
 def f_Rd(t):
@@ -140,18 +143,20 @@ wr = array([[0], [0], [0]])
 α = zeros((N, 1))
 
 f = 0.1*array([[1], [1], [1], [1], [1], [1]])
-clean3D(ax, -20, 20, -20, 20, 0, 25)
+clean3D(ax, -20, 20, -20, 20, -25, 25)
 i = 0
 for t in arange(0, 20, dt):
 
     p, R, vr, wr, f = clock_RUR(p, R, vr, wr, f, t)
-    clean3D(ax, -20, 20, -20, 20, 0, 25)
+    # clean3D(ax, -20, 20, -20, 20, -25, 25)
     # if i % 10 == 0:
-    draw_scene3D(ax, p, R, α, f)
+    # draw_scene3D(ax, p, R, α, f)
     # draw_platform(ax, pd(t), f_Rd(t))
     # plot3D(ax, p, 'red', 1)
-    ax.scatter(p[0, 0], p[1, 0], p[2, 0], c='red', marker='o')
-    ax.scatter(pd(t)[0, 0], pd(t)[1, 0], pd(t)[2, 0], c='blue', marker='o')
+    ax.scatter(p[0, 0], p[1, 0], p[2, 0], c='red',
+               marker='o')  # actual position
+    ax.scatter(pd(t)[0, 0], pd(t)[1, 0], pd(t)[2, 0],
+               c='blue', marker='o')  # desired trajectory
     α = α + dt * 30 * f
     i += 1
     pause(0.001)
