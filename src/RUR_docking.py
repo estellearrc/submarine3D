@@ -29,16 +29,25 @@ def draw_scene3D(ax, p, R, α, f):
     theta_left = -arctan2(f[1], f[0])
     draw_RUR(ax, R, p, α, theta_rear, theta_right, theta_left)
 
+# def pd(t):  
+#     return array([[4], [4], [10 + 0.1*sin(0.3*t)]])
+
 def pd(t):  
-    return array([[4], [4], [10 + 0.1*sin(0.3*t)]])
+    return array([[t], [t], [5]])
+
+# def dpd(t) :
+#     return array([[0.3*cos(0.3*t)],[-0.4*sin(0.4*t)],[0.03*cos(0.3*t)]])
 
 def dpd(t) :
-    return array([[0.3*cos(0.3*t)],[-0.4*sin(0.4*t)],[0.03*cos(0.3*t)]])
+    return array([[1],[1],[0]])
+# def ddpd(t) :
+#     return array([[-0.09*sin(0.3*t)],[-0.16*cos(0.4*t)],[-0.009*sin(0.3*t)]])
 
 def ddpd(t) :
-    return array([[-0.09*sin(0.3*t)],[-0.16*cos(0.4*t)],[-0.009*sin(0.3*t)]])
+    return array([[0],[0],[0]])
 
-def f_Rd(t):  return  expw([[sin(t)], [cos(2*t)], [t]])
+# def f_Rd(t):  return  expw([[sin(t)], [cos(2*t)], [t]])
+def f_Rd(t):  return  expw([[0], [0], [0]])
 def f_dRd(t): return (1/(2*dt))*(f_Rd(t+dt)-f_Rd(t-dt))
 def f_ddRd(t): return (1/(2*dt))*(f_dRd(t+dt)-f_dRd(t-dt))
 
@@ -86,11 +95,13 @@ inv_C = inv(C)
 
 def draw_platform(ax,pt,R):
     lz=5*l
-    T = tran3H(*-pt) @ ToH(R)
-    M = T @ add1([[lz,-lz,-lz, lz,lz],[lz,lz,-lz,-lz,lz],[0,0,0,0,0]])
+    T = tran3H(*-pt)
+    RH = ToH(R)
+    M = T@RH@add1([[lz,-lz,-lz, lz,lz],[lz,lz,-lz,-lz,lz],[0,0,0,0,0]])
 
     # Corps du robot
     T2 = tran3H(*-pt) @ ToH(R)
+    
     M2 = T2@cylinder3H(1, 10)
     draw3H(ax,M2,'grey',False,-1)
 
