@@ -48,8 +48,8 @@ def ddpd(t):
 
 def f_Rd(t):
     dp = dpd(t)
-    # return expw([[0], [0], [arctan2(dp[1], dp[0])]])
-    return expw([[0], [0], [0]])
+    return expw([[0], [0], [arctan2(dp[1], dp[0])]])
+    # return expw([[0], [0], [0]])
 
 
 def f_dRd(t): return (1/(2*dt))*(f_Rd(t+dt)-f_Rd(t-dt))
@@ -136,7 +136,7 @@ def clock_RUR(p, R, vr, wr, f, t):
     return p, R, vr, wr, f
 
 
-p = array([[10], [0], [0]])  # x,y,z (front,right,down)
+p = array([[5], [5], [0]])  # x,y,z (front,right,down)
 R = eulermat(0.2, 0.3, 0.4)
 vr = array([[0], [0], [0]])
 wr = array([[0], [0], [0]])
