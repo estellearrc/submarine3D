@@ -30,7 +30,7 @@ def draw_scene3D(ax, p, R, α, f):
 
 def pd(t):
     # return 20*array([[sin(t)], [sin(2*t)], [1 + 0.1*sin(0.3*t)]])
-    return 20*array([[cos(t)], [sin(t)], [0]])
+    return array([[10+20*cos(t)], [10+20*sin(t)], [0]])
 
 
 def dpd(t):
@@ -45,7 +45,8 @@ def ddpd(t):
 
 def f_Rd(t):
     dp = dpd(t)
-    return expw([[0], [0], [arctan2(dp[1], dp[0])]])
+    # return expw([[0], [0], [arctan2(dp[1], dp[0])]])
+    return expw([[0], [0], [0]])
 
 
 def f_dRd(t): return (1/(2*dt))*(f_Rd(t+dt)-f_Rd(t-dt))
@@ -148,8 +149,9 @@ for t in arange(0, 20, dt):
     # if i % 10 == 0:
     draw_scene3D(ax, p, R, α, f)
     # draw_platform(ax, pd(t), f_Rd(t))
-    plot3D(ax, p, 'red', 1)
-    scatter(p[0, 0], p[1, 0], p[2, 0], 'red', 'o')
+    # plot3D(ax, p, 'red', 1)
+    ax.scatter(p[0, 0], p[1, 0], p[2, 0], c='red', marker='o')
+    ax.scatter(pd(t)[0, 0], pd(t)[1, 0], pd(t)[2, 0], c='blue', marker='o')
     α = α + dt * 30 * f
     i += 1
     pause(0.001)

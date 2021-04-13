@@ -333,7 +333,7 @@ def draw_sphere3D(r):
 
 
 def draw_RUR(ax, R, p, α, theta_arr, theta_d, theta_g):
-    T = tran3H(*-p)
+    T = tran3H(*p)
     R = ToH(R)
 
     # the disc + the blades
