@@ -161,7 +161,6 @@ def rot3H(wx, wy, wz):
 
 def rot3H(wx, wy, wz): return ToH(expw([wx, wy, wz]))
 
-
 """
 def eulerH(φ, θ, ψ):
     Ad_i = adjoint(array([1, 0, 0]))
@@ -343,7 +342,7 @@ def draw_RUR(ax, R, p, α, theta_arr, theta_d, theta_g):
     # Corps du robot
     M = T@R @ cylinder3H(1, 10)
     ax.plot(M[0], M[1], 1*M[2], color='orange')
-    ax.plot(M[0], M[1], 0*M[2], color='grey')
+    # ax.plot(M[0], M[1], 0*M[2], color='grey')
 
     # tête du robot
     sphere = tran3H(10, 0, 0)@draw_sphere3D(1)
@@ -354,17 +353,17 @@ def draw_RUR(ax, R, p, α, theta_arr, theta_d, theta_g):
     P1 = rot3H(0, pi/2, 0)@eulerH(0, 0, theta_arr)@cylinder3H(0.5, 2)
     M1 = T@R@P1
     ax.plot(M1[0], M1[1], 1*M1[2], color='blue')
-    ax.plot(M1[0], M1[1], 0*M1[2], color='grey')
+    # ax.plot(M1[0], M1[1], 0*M1[2], color='grey')
 
     # hélice arrière
-    H1 = eulerH(theta_arr,0, 0)@eulerH(0, 0, α)@Ca  # we rotate the blades
+    H1 = eulerH(theta_arr, 0, 0)@eulerH(0, 0, α)@Ca  # we rotate the blades
     draw3H(ax, T@R@H1, 'red')
 
     # propulseur gauche
     P1 = tran3H(4, 2, 0)@rot3H(0, theta_g, 0)@cylinder3H(0.5, 2)
     M1 = T@R@P1
     ax.plot(M1[0], M1[1], 1*M1[2], color='green')
-    ax.plot(M1[0], M1[1], 0*M1[2], color='grey')
+    # ax.plot(M1[0], M1[1], 0*M1[2], color='grey')
 
     # hélice gauche
     H1 = tran3H(4, 2, 0)@rot3H(0, theta_g + pi/2,
@@ -375,7 +374,7 @@ def draw_RUR(ax, R, p, α, theta_arr, theta_d, theta_g):
     P1 = tran3H(4, -2, 0)@rot3H(0, theta_d, 0)@cylinder3H(0.5, 2)
     M1 = T@R@P1
     ax.plot(M1[0], M1[1], 1*M1[2], color='purple')
-    ax.plot(M1[0], M1[1], 0*M1[2], color='grey')
+    # ax.plot(M1[0], M1[1], 0*M1[2], color='grey')
 
     # hélice droite
     H1 = tran3H(4, -2, 0)@rot3H(0, theta_d + pi/2,
