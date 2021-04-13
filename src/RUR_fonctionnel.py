@@ -82,7 +82,6 @@ D = array([[1, 0, 1, 0, 0, 0], [0, 0, 0, 0, 1, 0], [0, 1, 0, 1, 0, 1]])
 N = D.shape[1]
 # concentrator
 C = vstack((D, Q))
-print(C)
 inv_C = inv(C)
 
 def draw_platform(ax,p,R):
@@ -90,26 +89,23 @@ def draw_platform(ax,p,R):
     T = tran3H(*-p) @ ToH(R)
     M = T @ add1([[lz,-lz,-lz, lz,lz],[lz,lz,-lz,-lz,lz],[0,0,0,0,0]])
 
-
     # Corps du robot
-    T2 = tran3H(*p) @ ToH(R)
+    T2 = tran3H(*-p) @ ToH(R)
     M2 = T2@cylinder3H(1, 10)
-    ax.plot(M2[0], M2[1], 1*M2[2], color='grey')
-    ax.plot(M2[0], M2[1], 0*M2[2], color='grey')
+    draw3H(ax,M2,'grey',False,-1)
 
     # tête du robot
     sphere = T2@tran3H(10, 0, 0)@draw_sphere3D(1)
-    SPH = sphere
-    ax.plot(SPH[0], SPH[1], SPH[2], color='grey')
+    draw3H(ax,sphere,'grey',False,-1)
 
-    draw3H(ax,M,'grey',True,-1)
+    draw3H(ax,M,'grey',False,-1)
 
 
 def clock_RUR(p,R,vr,wr,f,t):
     #Récupération de fr et tau_r
     fr,tau_r = control(p,R,vr,wr,t)
 
-    #Equation d'état et EUler combinés
+    #Equation d'état et Euler combinés
     p=p+dt* R@vr
     vr= vr + dt* (-adjoint(wr)@vr + inv(R)@array([[0],[0],[g*0]]) + (1/m)*fr)
     R=R@expm(adjoint(dt*wr))
@@ -138,6 +134,7 @@ for t in arange(0,20,dt):
     draw_platform(ax, pd(t), f_Rd(t))
     α = α + dt * 30 * f
     pause(0.001)
+
 pause(10)
 
 

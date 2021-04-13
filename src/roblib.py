@@ -334,55 +334,51 @@ def draw_sphere3D(r):
 
 
 def draw_RUR(ax, R, p, α, theta_arr, theta_d, theta_g):
-
-    T = tran3H(*p)
+    T = tran3H(*-p)
     R = ToH(R)
+
     # the disc + the blades
-    Ca = hstack((circle3H(1), [[1, -1], [0, 0], [0, 0], [1, 1]]))
+    Ca = hstack(([[1, -1], [0, 0], [0, 0], [1, 1]],circle3H(1)))
 
     # Corps du robot
-    M = T@R @ cylinder3H(1, 10)
-    ax.plot(M[0], M[1], 1*M[2], color='orange')
-    ax.plot(M[0], M[1], 0*M[2], color='grey')
+    M = T@R@cylinder3H(1, 10)
+    draw3H(ax,M,'orange',True,-1)
 
     # tête du robot
-    sphere = tran3H(10, 0, 0)@draw_sphere3D(1)
-    SPH = T@R@sphere
-    ax.plot(SPH[0], SPH[1], SPH[2], color='orange')
+    sphere = T@R@tran3H(10, 0, 0)@draw_sphere3D(1)
+    draw3H(ax,sphere,'orange',True,-1)
 
     # propulseur arrière
     P1 = rot3H(0, pi/2, 0)@eulerH(0, 0, theta_arr)@cylinder3H(0.5, 2)
     M1 = T@R@P1
-    ax.plot(M1[0], M1[1], 1*M1[2], color='blue')
-    ax.plot(M1[0], M1[1], 0*M1[2], color='grey')
+    draw3H(ax,M1,'blue',True,-1)
 
     # hélice arrière
     H1 = eulerH(theta_arr,0, 0)@eulerH(0, 0, α)@Ca  # we rotate the blades
-    draw3H(ax, T@R@H1, 'red')
+    draw3H(ax, T@R@H1 , 'red',False,-1)
+
 
     # propulseur gauche
     P1 = tran3H(4, 2, 0)@rot3H(0, theta_g, 0)@cylinder3H(0.5, 2)
     M1 = T@R@P1
-    ax.plot(M1[0], M1[1], 1*M1[2], color='green')
-    ax.plot(M1[0], M1[1], 0*M1[2], color='grey')
+    draw3H(ax,M1,'green',True,-1)
 
     # hélice gauche
     H1 = tran3H(4, 2, 0)@rot3H(0, theta_g + pi/2,
                                0)@eulerH(0, 0, α)@Ca  # we rotate the blades
-    draw3H(ax, T@R@H1, 'red')
+    draw3H(ax, T@R@H1 , 'red',False,-1)
+   
 
     # propulseur droit
     P1 = tran3H(4, -2, 0)@rot3H(0, theta_d, 0)@cylinder3H(0.5, 2)
     M1 = T@R@P1
-    ax.plot(M1[0], M1[1], 1*M1[2], color='purple')
-    ax.plot(M1[0], M1[1], 0*M1[2], color='grey')
+    draw3H(ax,M1,'purple',True,-1)
 
     # hélice droite
     H1 = tran3H(4, -2, 0)@rot3H(0, theta_d + pi/2,
                                 0)@eulerH(0, 0, α)@Ca  # we rotate the blades
-    draw3H(ax, T@R@H1, 'red')
+    draw3H(ax, T@R@H1 , 'red',False,-1)
 
-    pause(0.001)
 
 
 def plot2D(M, col='black', w=1):
