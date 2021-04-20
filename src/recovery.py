@@ -4,7 +4,7 @@ import math
 fig = figure()
 ax = Axes3D(fig)
 
-dt = 0.05
+dt = 0.1
 
 Cx = 1
 # AUV caracteristics
@@ -33,21 +33,21 @@ def pd(t):
     # return 20*array([[sin(t)], [sin(2*t)], [1 + 0.1*sin(0.3*t)]])
     # return array([[20*cos(0.5*t)], [20*sin(0.5*t)], [0]])
     # return array([[0], [0], [0]])
-    return array([[10+10*cos(t)], [10*sin(t)], [2*10*sin(0.5*t)]])
+    return array([[10+20*cos(t)], [20*sin(t)], [0*2*10*sin(0.5*t)]])
 
 
 def dpd(t):
     # return 20*array([[cos(t)], [2*cos(2*t)], [0.03*cos(0.3*t)]])
     # return 20*array([[-sin(0.5*t)], [cos(0.5*t)], [0]])
     # return array([[0], [0], [0]])
-    return array([[-10*sin(t)], [10*cos(t)], [10*cos(0.5*t)]])
+    return array([[-20*sin(t)], [20*cos(t)], [0*10*cos(0.5*t)]])
 
 
 def ddpd(t):
     # return 20*array([[-sin(t)], [-4*sin(2*t)], [-0.009*sin(0.3*t)]])
     # return 20*array([[-cos(0.5*t)], [-sin(0.5*t)], [0]])
     # return array([[0], [0], [0]])
-    return array([[-10*cos(t)], [-10*sin(t)], [-5*sin(0.5*t)]])
+    return array([[-20*cos(t)], [-20*sin(t)], [-5*sin(0.5*t)*0]])
 
 
 # # project the estimated position p on the line of unit vector xk, passing by A
@@ -80,7 +80,7 @@ def cross_col(a, b): return np.cross(a.T, b.T).T
 
 
 def f_Rd(t):
-    dp = pd(t) + dt*dpd(t)
+    dp = -dpd(t)
     # p1 = pd(t)
     # p2 = pd(t+dt)
     # psy = angle(dp)
@@ -92,27 +92,32 @@ def f_Rd(t):
     # return expw([[p[0] + dt*dp[0]], [p[1] + dt*dp[1]], [p[2] + dt*dp[2]]])
     # return expw([[0], [0], [arctan2(dp[1], dp[0])]])
     up = array([[0], [0], [1]])
-    direction = normalize(dp)
+    xaxis = normalize(dp)
     # print(direction)
-    xaxis = cross_col(up, direction)
-    xaxis = normalize(xaxis)
-    yaxis = cross_col(direction, xaxis)
+    yaxis = cross_col(xaxis, up)
     yaxis = normalize(yaxis)
-    R = array([[direction[0, 0], direction[1, 0], direction[2, 0]], [
-              xaxis[0, 0], xaxis[1, 0], xaxis[2, 0]], [yaxis[0, 0], yaxis[1, 0], yaxis[2, 0]]])
-    print(R)
-    return R
+    zaxis = cross_col(xaxis, yaxis)
+    zaxis = normalize(zaxis)
+    R = array([[xaxis[0, 0], xaxis[1, 0], xaxis[2, 0]], [
+              yaxis[0, 0], yaxis[1, 0], yaxis[2, 0]], [zaxis[0, 0], zaxis[1, 0], zaxis[2, 0]]])
+    #print(R)
+    # tang = arctan2(dp[2]-pd_[2],dp[1]-pd_[1])
+    # cap = arctan2(dp[1]-pd_[1],dp[0]-pd_[0])
+    
+    # Rdes = expw([[0],[0],[cap]])
+
+    return expm(pi * adjoint(array([[1], [0], [0]])))@R@expm((-pi/3)* adjoint(array([[0], [0], [1]])))@expm((-pi/2 + pi/10)* adjoint(array([[0], [0], [1]])))
     # return eulermat(0, 0, 0)
 
 
 def f_dRd(t):
-    # return (1/(2*dt))*(f_Rd(t+dt)-f_Rd(t-dt))
-    return eulermat(0, 0, 0)
+    return (1/(2*dt))*(f_Rd(t+dt)-f_Rd(t-dt))
+    #return eulermat(0, 0, 0)
 
 
 def f_ddRd(t):
-    # return (1/(2*dt))*(f_dRd(t+dt)-f_dRd(t-dt))
-    return eulermat(0, 0, 0)
+    return (1/(2*dt))*(f_dRd(t+dt)-f_dRd(t-dt))
+    #return eulermat(0, 0, 0)
 
 
 def positioner(p, R, vr, wr, t):
@@ -198,7 +203,7 @@ def clock_RUR(p, R, vr, wr, f, t):
     return p, R, vr, wr, f
 
 
-p = array([[10], [0], [0]])  # x,y,z (front,right,down)
+p = array([[20], [0], [0]])  # x,y,z (front,right,down)
 R = eulermat(0.2, 0.3, 0.4)
 vr = array([[0], [0], [0]])
 wr = array([[0], [0], [0]])
@@ -219,9 +224,12 @@ for t in arange(0, 20, dt):
                marker='o')  # actual position
     ax.scatter(pd(t)[0, 0], pd(t)[1, 0], pd(t)[2, 0],
                c='blue', marker='o')  # desired trajectory
-    ax.quiver(p[0, 0], p[1, 0], p[2, 0], 5*dt*dpd(t)[0],
-              5*dt*dpd(t)[1], 5*dt*dpd(t)[2])
+    ax.scatter(10, 0, 0,
+               c='green', marker='o')  # desired trajectory
+    #ax.quiver(p[0, 0], p[1, 0], p[2, 0], 5*dt*dpd(t)[0],
+     #          5*dt*dpd(t)[1], 5*dt*dpd(t)[2])
     Rd = f_Rd(t)
+    #draw_scene3D(ax, p, Rd, α, f)
     φ, θ, ψ = eulermat2angles(Rd)
     # print("phi =", φ)
     # print("theta =", θ)
