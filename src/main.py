@@ -24,23 +24,25 @@ def draw_scene3D(ax, p, R, α, f):
     theta_left = -arctan2(f[1], f[0])
     draw_RUR(ax, R, p, α, theta_rear, theta_right, theta_left)
 
+# def pd(t):  
+#     return array([[4], [4], [10 + 0.1*sin(0.3*t)]])
 
-def pd(t): return array([[sin(0.3*t)], [cos(0.4*t)], [-10+0.1*sin(0.3*t)]])
+def pd(t):  
+    return array([[3*t], [0], [5]])
 
+# def dpd(t) :
+#     return array([[0.3*cos(0.3*t)],[-0.4*sin(0.4*t)],[0.03*cos(0.3*t)]])
 
-def dpd(t):
-    return array(
-        [[0.3*cos(0.3*t)], [-0.4*sin(0.4*t)], [0.1*0.3*cos(0.3*t)]])
+def dpd(t) :
+    return array([[3],[0],[0]])
+# def ddpd(t) :
+#     return array([[-0.09*sin(0.3*t)],[-0.16*cos(0.4*t)],[-0.009*sin(0.3*t)]])
 
+def ddpd(t) :
+    return array([[0],[0],[0]])
 
-
-def ddpd(t):
-    return array([[-0.3*0.3*sin(0.3*t)],
-                  [-0.4*0.4*cos(0.4*t)], [-0.1*0.3*0.3*sin(0.3*t)]])
-
-
-
-def Rd(t): return expw([[sin(t)], [cos(2*t)], [t]])
+# def f_Rd(t):  return  expw([[sin(t)], [cos(2*t)], [t]])
+def f_Rd(t):  return  expw([[0], [0], [0]])
 def dRd(t): return (1/(2*dt))*(Rd(t+dt)-Rd(t-dt))
 def ddRd(t): return (1/(2*dt))*(dRd(t+dt)-dRd(t-dt))
 
@@ -110,7 +112,7 @@ wr = array([[0], [0], [0]])
 
 
 for t in arange(0, 10, dt):
-    f = 0.1*array([[0], [0], [0], [0], [1], [0]])
+    f = array([[100], [0], [-100], [0], [0], [0]])
     #f = control(t, p, R, vr, wr)
     p, R, vr, wr = clock_RUR(p, R, vr, wr, f)
     clean3D(ax, -20, 20, -20, 20, 0, 25)
