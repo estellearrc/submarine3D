@@ -80,7 +80,7 @@ def cross_col(a, b): return np.cross(a.T, b.T).T
 
 
 def f_Rd(t):
-    dp = -dpd(t)
+    dp = pd(t) + dt*dpd(t)
     # p1 = pd(t)
     # p2 = pd(t+dt)
     # psy = angle(dp)
@@ -101,8 +101,8 @@ def f_Rd(t):
     R = array([[direction[0, 0], direction[1, 0], direction[2, 0]], [
               xaxis[0, 0], xaxis[1, 0], xaxis[2, 0]], [yaxis[0, 0], yaxis[1, 0], yaxis[2, 0]]])
     print(R)
-    # return R
-    return eulermat(0, 0, 0)
+    return R
+    # return eulermat(0, 0, 0)
 
 
 def f_dRd(t):
@@ -210,9 +210,9 @@ i = 0
 for t in arange(0, 20, dt):
 
     p, R, vr, wr, f = clock_RUR(p, R, vr, wr, f, t)
-    # clean3D(ax, -20, 20, -20, 20, -25, 25)
+    clean3D(ax, -20, 20, -20, 20, -25, 25)
     # if i % 10 == 0:
-    # draw_scene3D(ax, p, R, α, f)
+    draw_scene3D(ax, p, R, α, f)
     # draw_platform(ax, pd(t), f_Rd(t))
     # plot3D(ax, p, 'red', 1)
     ax.scatter(p[0, 0], p[1, 0], p[2, 0], c='red',
