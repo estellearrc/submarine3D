@@ -30,7 +30,7 @@ def draw_scene3D(ax, p, R, α, f):
 
 def pd(t):
     # return 20*array([[sin(t)], [sin(2*t)], [1 + 0.1*sin(0.3*t)]])
-    return array([[20*cos(t)], [20*sin(t)], [6]])
+    return array([[20*cos(t)], [20*sin(t)], [0]])
 
 
 def dpd(t):
@@ -45,8 +45,8 @@ def ddpd(t):
 
 def f_Rd(t):
     dp = dpd(t)
-    return expw([[0], [0], [arctan2(dp[1], dp[0])]])
-    #return expw([[0], [0], [0]])
+    # return expw([[0], [0], [arctan2(dp[1], dp[0])]])
+    return expw([[0], [0], [0]])
 
 
 def f_dRd(t): return (1/(2*dt))*(f_Rd(t+dt)-f_Rd(t-dt))
