@@ -3,7 +3,7 @@ from roblib import *
 fig = figure()
 ax = Axes3D(fig)
 
-dt = 0.05
+dt = 0.1
 
 Cx = 1
 # AUV caracteristics
@@ -31,25 +31,25 @@ def draw_scene3D(ax, p, R, α, f):
 def pd(t):
     # return 20*array([[sin(t)], [sin(2*t)], [1 + 0.1*sin(0.3*t)]])
     # return array([[10+20*cos(t)], [10+20*sin(t)], [0]])
-    return array([[10+10*cos(t)], [10*sin(t)], [2*10*sin(0.5*t)]])
+    return array([[10+10*cos(t)], [10*sin(t)], [10*sin(t)]])
 
 
 def dpd(t):
     # return 20*array([[cos(t)], [2*cos(2*t)], [0.03*cos(0.3*t)]])
     # return 20*array([[-sin(t)], [cos(t)], [0]])
-    return array([[-10*sin(t)], [10*cos(t)], [10*cos(0.5*t)]])
+    return array([[-10*sin(t)], [10*cos(t)], [10*cos(t)]])
 
 
 def ddpd(t):
     # return 20*array([[-sin(t)], [-4*sin(2*t)], [-0.009*sin(0.3*t)]])
     # return 20*array([[-cos(t)], [-sin(t)], [0]])
-    return array([[-10*cos(t)], [-10*sin(t)], [-5*sin(0.5*t)]])
+    return array([[-10*cos(t)], [-10*sin(t)], [-10*sin(t)]])
 
 
 def f_Rd(t):
     dp = dpd(t)
-    return expw([[0], [0], [arctan2(dp[1], dp[0])]])
-    # return expw([[0], [0], [0]])
+    #return expw([[0], [0], [arctan2(dp[1], dp[0])]])
+    return expw([[0], [0], [0]])
 
 
 def f_dRd(t): return (1/(2*dt))*(f_Rd(t+dt)-f_Rd(t-dt))
@@ -146,7 +146,7 @@ f = 0.1*array([[1], [1], [1], [1], [1], [1]])
 clean3D(ax, -20, 20, -20, 20, -25, 25)
 i = 0
 for t in arange(0, 20, dt):
-
+    clean3D(ax, -20, 20, -20, 20, 0, 25)
     p, R, vr, wr, f = clock_RUR(p, R, vr, wr, f, t)
     # clean3D(ax, -20, 20, -20, 20, -25, 25)
     # if i % 10 == 0:
@@ -157,6 +157,7 @@ for t in arange(0, 20, dt):
                marker='o')  # actual position
     ax.scatter(pd(t)[0, 0], pd(t)[1, 0], pd(t)[2, 0],
                c='blue', marker='o')  # desired trajectory
+    draw_scene3D(ax, p, R, α, f)
     α = α + dt * 30 * f
     i += 1
     pause(0.001)

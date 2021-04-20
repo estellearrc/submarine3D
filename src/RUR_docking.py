@@ -33,13 +33,13 @@ def draw_scene3D(ax, p, R, α, f):
 #     return array([[4], [4], [10 + 0.1*sin(0.3*t)]])
 
 def pd(t):  
-    return array([[t], [t], [5]])
+    return array([[-3*t], [0], [5]])
 
 # def dpd(t) :
 #     return array([[0.3*cos(0.3*t)],[-0.4*sin(0.4*t)],[0.03*cos(0.3*t)]])
 
 def dpd(t) :
-    return array([[1],[1],[0]])
+    return array([[3],[0],[0]])
 # def ddpd(t) :
 #     return array([[-0.09*sin(0.3*t)],[-0.16*cos(0.4*t)],[-0.009*sin(0.3*t)]])
 
@@ -141,9 +141,9 @@ for t in arange(0,20,dt):
     
     p, R, vr, wr,f = clock_RUR(p, R, vr, wr, f,t)
     clean3D(ax, -20, 20, -20, 20, 0, 25)
-    ax.scatter(4,4,10)
+    ax.scatter(-3*t,0,5)
     draw_scene3D(ax, p, R, α, f)
-    draw_platform(ax, pd(t), f_Rd(t))
+    #draw_platform(ax, pd(t), f_Rd(t))
     α = α + dt * 30 * f
     pause(0.001)
 

@@ -176,9 +176,10 @@ def eulerH(φ, θ, ψ):
 
 
 def draw3H(ax, M, col, shadow=False, mirror=1):  # mirror=-1 in case z in directed downward
-    ax.plot(mirror * M[0], M[1], mirror * M[2], color=col)
     if shadow:
         ax.plot(mirror * M[0], M[1], 0 * M[2], color='gray')
+    ax.plot(mirror * M[0], M[1], mirror * M[2], color=col)
+    
 
 
 def cube3H():
@@ -355,7 +356,7 @@ def draw_RUR(ax, R, p, α, theta_arr, theta_d, theta_g):
 
     # hélice arrière
     H1 = eulerH(theta_arr, 0, 0)@eulerH(0, 0, α)@Ca  # we rotate the blades
-    draw3H(ax, T@R@H1, 'red', False, -1)
+    draw3H(ax, T@R@H1, 'red', True, -1)
 
     # propulseur gauche
     P1 = tran3H(4, 2, 0)@rot3H(0, theta_g, 0)@cylinder3H(0.5, 2)
@@ -365,7 +366,7 @@ def draw_RUR(ax, R, p, α, theta_arr, theta_d, theta_g):
     # hélice gauche
     H1 = tran3H(4, 2, 0)@rot3H(0, theta_g + pi/2,
                                0)@eulerH(0, 0, α)@Ca  # we rotate the blades
-    draw3H(ax, T@R@H1, 'red', False, -1)
+    draw3H(ax, T@R@H1, 'red', True, -1)
 
     # propulseur droit
     P1 = tran3H(4, -2, 0)@rot3H(0, theta_d, 0)@cylinder3H(0.5, 2)
@@ -375,7 +376,7 @@ def draw_RUR(ax, R, p, α, theta_arr, theta_d, theta_g):
     # hélice droite
     H1 = tran3H(4, -2, 0)@rot3H(0, theta_d + pi/2,
                                 0)@eulerH(0, 0, α)@Ca  # we rotate the blades
-    draw3H(ax, T@R@H1, 'red', False, -1)
+    draw3H(ax, T@R@H1, 'red', True, -1)
 
 
 def plot2D(M, col='black', w=1):
