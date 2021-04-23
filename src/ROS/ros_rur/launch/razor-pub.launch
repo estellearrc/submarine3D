@@ -1,0 +1,7 @@
+<launch>
+  <arg name="razor_config_file" default="./config/razor.yaml"/>
+  <node pkg="drivers" type="imu_driver.py" name="imu_driver" output="screen">
+  <!-- <node pkg="drivers" type="imu_driver.py" name="imu_driver" output="screen" respawn="true" respawn_delay="2"> -->
+    <rosparam file="$(arg razor_config_file)" command="load"/>
+  </node>
+</launch>

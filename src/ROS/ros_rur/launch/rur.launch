@@ -1,0 +1,43 @@
+<launch>
+	<group ns="uuv">
+		<!-- IMU -->
+
+		<node pkg="drivers" name = "imu" type="imu_driver.py" output="screen" />
+		<arg name="razor_config_file" default="./config/razor.yaml"/>
+		<node pkg="drivers" type="imu_driver.py" name="imu_driver" output="screen">
+		<!-- <node pkg="razor_imu_9dof" type="imu_driver.py" name="imu_driver" output="screen" respawn="true" respawn_delay="2"> -->
+		<rosparam file="$(arg razor_config_file)" command="load"/>
+		</node>
+		
+
+		<!-- GPS -->
+
+		<arg name="port" default="/dev/ttyUSB0" />
+		<arg name="baud" default="4800" />
+		<arg name="frame_id" default="gps" />
+		<arg name="use_GNSS_time" default="False" />
+		<arg name="time_ref_source" default="gps" />
+		<arg name="useRMC" default="False" />
+
+		<node name="gps_driver" pkg="drivers" type="nmea_serial_driver.py" output="screen">
+		<param name="port" value="$(arg port)"/>
+		<param name="baud" value="$(arg baud)" />
+		<param name="frame_id" value="$(arg frame_id)" />
+		<param name="use_GNSS_time" value="$(arg use_GNSS_time)" />
+		<param name="time_ref_source" value="$(arg time_ref_source)" />
+		<param name="useRMC" value="$(arg useRMC)" />
+		</node>
+
+		<!-- Le reste -->
+		
+		<node pkg="drivers" name = "esc" type="esc_driver.py" output="screen" />
+		<node pkg="drivers" name = "pap" type="pap_driver.py" output="screen" />
+		<node pkg="drivers" name = "pressure" type="pressure_driver.py" output="screen" />
+		<node pkg="control" name = "control" type="control.py" output="screen" />
+		<node pkg="control" name = "command" type="command.py" output="screen" />
+		<node pkg="communication" name = "com" type="comm.py" output="screen" />
+		<node pkg="communication" name = "camera" type="camera.py" output="screen" />
+		<node pkg="communication" name = "led" type="led.py" output="screen" />
+		<node pkg="communication" name = "sim" type="SIM.py" output="screen" />
+	</group>
+</launch>
