@@ -30,31 +30,15 @@ def draw_scene3D(ax, p, R, α, f):
 
 
 def pd(t):
-    # return 20*array([[sin(t)], [sin(2*t)], [1 + 0.1*sin(0.3*t)]])
-    # return array([[20*cos(0.5*t)], [20*sin(0.5*t)], [0]])
-    # return array([[0], [0], [0]])
-    return array([[20+20*cos(t)], [20*sin(t)], [20*sin(0.5*t)]])
+    return array([[20+20*cos(t)], [20*sin(t)], [3]])
 
 
 def dpd(t):
-    # return 20*array([[cos(t)], [2*cos(2*t)], [0.03*cos(0.3*t)]])
-    # return 20*array([[-sin(0.5*t)], [cos(0.5*t)], [0]])
-    # return array([[0], [0], [0]])
-    return array([[-20*sin(t)], [20*cos(t)], [10*cos(0.5*t)]])
+    return array([[-20*sin(t)], [20*cos(t)], [0]])
 
 
 def ddpd(t):
-    # return 20*array([[-sin(t)], [-4*sin(2*t)], [-0.009*sin(0.3*t)]])
-    # return 20*array([[-cos(0.5*t)], [-sin(0.5*t)], [0]])
-    # return array([[0], [0], [0]])
-    return array([[-20*cos(t)], [-20*sin(t)], [-5*sin(0.5*t)]])
-
-
-# # project the estimated position p on the line of unit vector xk, passing by A
-# def proj_on_line(p, xk, A):
-#     P = A + (p - A).T[0].dot(xk.T[0]) * xk  # projection point
-#     e = np.linalg.norm(P - p, 2)  # distance to the line
-#     return P, e
+    return array([[-20*cos(t)], [-20*sin(t)], [0]])
 
 
 def normalize(v):
@@ -67,30 +51,8 @@ def normalize(v):
 def cross_col(a, b): return np.cross(a.T, b.T).T
 
 
-# def step1(self, Rk, lk, p):  # from {Rk,lk,p} to {Rd}
-#     # rotation of angle θe along the axis ew to reduce the distance to the line e
-#     self.Rd = Rk
-#     xk = Rk[:, [0]]
-#     P, e = proj_on_line(p, xk, lk[:, [0]])
-#     if e > 0:
-#         θe = 0.5 * math.atan(e)  # gain 0.5 to reduce overshooting
-#         mp = normalize(P - p)
-#         ew = cross_col(xk, mp)
-#         self.Rd = expw(θe * ew) @ Rk
-
-
 def f_Rd(t):
     dp = -dpd(t)
-    # p1 = pd(t)
-    # p2 = pd(t+dt)
-    # psy = angle(dp)
-    # theta, R = angle3d(p2-p1, p1 + dt*dp)
-    # theta, R = angle3d(p1, dp)
-    # return R
-    # return eulermat(0, 0, psy)
-    # return expw([[arctan2(dp[2], dp[1])], [arctan2(dp[2], dp[0])], [arctan2(dp[1], dp[0])]])
-    # return expw([[p[0] + dt*dp[0]], [p[1] + dt*dp[1]], [p[2] + dt*dp[2]]])
-    # return expw([[0], [0], [arctan2(dp[1], dp[0])]])
     up = array([[0], [0], [1]])
     xaxis = normalize(dp)
     # print(direction)
@@ -100,13 +62,8 @@ def f_Rd(t):
     zaxis = normalize(zaxis)
     R = array([[xaxis[0, 0], xaxis[1, 0], xaxis[2, 0]], [
               yaxis[0, 0], yaxis[1, 0], yaxis[2, 0]], [zaxis[0, 0], zaxis[1, 0], zaxis[2, 0]]])
-    #print(R)
-    # tang = arctan2(dp[2]-pd_[2],dp[1]-pd_[1])
-    # cap = arctan2(dp[1]-pd_[1],dp[0]-pd_[0])
-    
-    # Rdes = expw([[0],[0],[cap]])
 
-    return expm(pi * adjoint(array([[1], [0], [0]])))@R@expm((-pi/3)* adjoint(array([[0], [0], [1]])))#@expm((-pi/2 + pi/10)* adjoint(array([[0], [0], [1]])))
+    return expm(pi * adjoint(array([[1], [0], [0]])))@R@expm((-pi/3)* adjoint(array([[0], [0], [1]])))@expm((-pi/2 + pi/10)* adjoint(array([[0], [0], [1]])))
     #return eulermat(0, 0, 0)
 
 
@@ -203,7 +160,7 @@ def clock_RUR(p, R, vr, wr, f, t):
     return p, R, vr, wr, f
 
 
-p = array([[20], [0], [0]])  # x,y,z (front,right,down)
+p = array([[15], [-5], [-8]])  # x,y,z (front,right,down)
 R = eulermat(0.2, 0.3, 0.4)
 vr = array([[0], [0], [0]])
 wr = array([[0], [0], [0]])
@@ -213,7 +170,6 @@ f = 0.1*array([[1], [1], [1], [1], [1], [1]])
 clean3D(ax, -20, 20, -20, 20, -25, 25)
 i = 0
 
-z=linspace(0,20,400)
 
 liste_pos=[p]
 
@@ -224,32 +180,21 @@ for t in arange(0, 20, dt):
     liste_pos.append(p)
 
     clean3D(ax, -30, 30, -30, 30, -25, 25)
-    # if i % 10 == 0:
 
     for pos in liste_pos :
         ax.scatter(pos[0,0], pos[1,0], pos[2,0], c='red', marker='.')
 
-    ax.plot(20+20*cos(z), 20*sin(z), 20*sin(0.5*z))
-
     draw_scene3D(ax, p, R, α, f)
-    # draw_platform(ax, pd(t), f_Rd(t))
-    # plot3D(ax, p, 'red', 1)
+
     ax.scatter(p[0, 0], p[1, 0], p[2, 0], c='red',
                marker='o')  # actual position
-    ax.scatter(pd(ti)[0, 0], pd(ti)[1, 0], pd(ti)[2, 0],
-               c='blue', marker='o')  # desired trajectory
-    ax.scatter(20, 0, 20*sin(0.5*ti),
+    ax.scatter(20, 0, 3,
                c='green', marker='o')  # desired trajectory
-    #ax.quiver(p[0, 0], p[1, 0], p[2, 0], 5*dt*dpd(t)[0],
-     #          5*dt*dpd(t)[1], 5*dt*dpd(t)[2])
+   
     Rd = f_Rd(ti)
-    #draw_scene3D(ax, p, Rd, α, f)
-    #φ, θ, ψ = eulermat2angles(Rd)
-    # print("phi =", φ)
-    # print("theta =", θ)
-    # print("psy =", ψ)
+  
     α = α + dt * 30 * f
-    #i += 1
+
     pause(0.001)
 
 pause(10)
