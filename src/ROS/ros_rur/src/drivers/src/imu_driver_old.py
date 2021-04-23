@@ -122,7 +122,7 @@ class IMU():
     ZA_OFFSET_H         = 0x7D # r/w
     ZA_OFFSET_L         = 0x7E # r/w
 
-    def __init__(self, ADDRESS = IMU.WHO_AM_I, bus = 0):
+    def __init__(self, ADDRESS = 0x75, bus = 0):
         self.address = ADDRESS
         self.bus = bus
 
