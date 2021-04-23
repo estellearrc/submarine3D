@@ -1,4 +1,5 @@
 from roblib import * 
+import math
 
 
 # Initialisation 
@@ -41,6 +42,20 @@ t = 0
 α = 0
 commande = "forward"
 
+p_g = array([[10], [0], [0]])
+R_g = eulermat(0,0,0)
+vr_g = array([[0], [0], [0]])
+wr_g = array([[0], [0], [0]])
+
+
+def normalize(v):
+    if v[0, 0] == 0 and v[1, 0] == 0 and v[2, 0] == 0:
+        return v
+    else:
+        return v / np.linalg.norm(v, 2)
+
+def cross_col(a, b): return np.cross(a.T, b.T).T
+
 def draw_scene3D(ax, p, R, α, f):
     f = f.flatten()
     theta_rear = -arctan2(f[5], f[4])
@@ -51,11 +66,28 @@ def draw_scene3D(ax, p, R, α, f):
 
 def pd(t):  
     if commande == "stay" :
-        return array([[p[0,0]], [p[1,0]], [p[2,0]]])
+        return array([[p_g[0,0]], [p_g[1,0]], [p_g[2,0]]])
 
     if commande == "forward" :
-        return array([[p[0,0] - t], [p[1,0]], [p[2,0]]])
+        return array([[p_g[0,0] - t], [p_g[1,0]], [p_g[2,0]]])
+    
+    if commande == "backward" :
+        return array([[p_g[0,0] + t], [p_g[1,0]], [p_g[2,0]]])
 
+    if commande == "up" :
+        return array([[p_g[0,0]], [p_g[1,0]], [p_g[2,0]+t]])
+
+    if commande == "down" :
+        return array([[p_g[0,0]], [p_g[1,0]], [p_g[2,0]-t]])
+
+    if commande == "right" :
+        return array([[p_g[0,0]], [p_g[1,0]+t], [p_g[2,0]]])
+
+    if commande == "left" :
+        return array([[p_g[0,0]], [p_g[1,0]-t], [p_g[2,0]]])
+    
+    if commande == "observe": 
+        return array([[5+20*cos(t) + p_g[0,0]], [20*sin(t) + p_g[1,0]], [p_g[2,0]]])
 
 
 
@@ -64,11 +96,55 @@ def dpd(t) :
         return array([[0],[0],[0]])
     if commande == "forward": 
         return array([[1],[0],[0]])
+    if commande == "backward": 
+        return array([[-1],[0],[0]])
+    if commande == "up": 
+        return array([[0],[0],[1]])
+    if commande == "down": 
+        return array([[0],[0],[-1]])
+    if commande == "right": 
+        return array([[0],[1],[0]])
+    if commande == "left": 
+        return array([[0],[-1],[0]])
+
+    if commande == "observe": 
+        return array([[-20*sin(t)], [20*cos(t)], [0]])
 
 def ddpd(t) :
+    if commande == "observe" :
+        array([[-20*cos(t)], [-20*sin(t)], [0]])
     return array([[0],[0],[0]])
+    
 
-def f_Rd(t):  return  expw([[0], [0], [0]])
+def f_Rd(t):  
+    if commande == "up": 
+        return R_g@expw([[0], [pi/2], [0]])
+    if commande == "down": 
+        return R_g@expw([[0], [-pi/2], [0]])
+    if commande == "right": 
+        return R_g@expw([[0], [0], [pi/2]])
+    if commande == "left": 
+        return R_g@expw([[0], [0], [-pi/2]])
+
+    if commande == "stay": 
+        return expw([[0], [0], [0]])
+
+    if commande == "observe": 
+        dp = -dpd(t)
+        up = array([[0], [0], [1]])
+        xaxis = normalize(dp)
+        # print(direction)
+        yaxis = cross_col(xaxis, up)
+        yaxis = normalize(yaxis)
+        zaxis = cross_col(xaxis, yaxis)
+        zaxis = normalize(zaxis)
+        R = array([[xaxis[0, 0], xaxis[1, 0], xaxis[2, 0]], [
+                yaxis[0, 0], yaxis[1, 0], yaxis[2, 0]], [zaxis[0, 0], zaxis[1, 0], zaxis[2, 0]]])
+
+        return R_g@expm(pi * adjoint(array([[1], [0], [0]])))@R@expm((-pi/3)* adjoint(array([[0], [0], [1]])))@expm((-pi/2 + pi/10)* adjoint(array([[0], [0], [1]])))
+
+    return  R_g@expw([[0], [0], [0]])
+
 def f_dRd(t): return (1/(2*dt))*(f_Rd(t+dt)-f_Rd(t-dt))
 def f_ddRd(t): return (1/(2*dt))*(f_dRd(t+dt)-f_dRd(t-dt))
 
@@ -146,14 +222,33 @@ def simu(p, R, vr, wr, f,t,α) :
         try :
             t+=0.1
             p, R, vr, wr,f = clock_RUR(p, R, vr, wr, f,t)
+
+            global p_g
+            p_g = p
+
+            global vr_g
+            vr_g = vr
+
+            global wr_g
+            wr_g = wr
+
+            global f_g
+            f_g = f
+
             clean3D(ax, -50, 50, -50, 50, 0, 50)
+
+            #draw_platform(ax, pd(t), f_Rd(t))
             draw_scene3D(ax, p, R, α, f)
-            draw_platform(ax, pd(t), f_Rd(t))
+
             α = α + dt * 30 * f
             pause(0.001)
+
         except KeyboardInterrupt :
-            global commande 
+            global commande
             commande = input("Entrer une commande : ")
+            t = 0
+            global R_g
+            R_g = R
             simu(p, R, vr, wr, f,t,α)
 
 

@@ -241,15 +241,11 @@ for t in arange(0, 20, dt):
     ax.scatter(20, 0, 20*sin(0.5*ti),
                c='green', marker='o')  # desired trajectory
     #ax.quiver(p[0, 0], p[1, 0], p[2, 0], 5*dt*dpd(t)[0],
-     #          5*dt*dpd(t)[1], 5*dt*dpd(t)[2])
+    #         5*dt*dpd(t)[1], 5*dt*dpd(t)[2])
     Rd = f_Rd(ti)
-    #draw_scene3D(ax, p, Rd, α, f)
-    #φ, θ, ψ = eulermat2angles(Rd)
-    # print("phi =", φ)
-    # print("theta =", θ)
-    # print("psy =", ψ)
+
     α = α + dt * 30 * f
-    #i += 1
+
     pause(0.001)
 
 pause(10)

@@ -1,5 +1,4 @@
-forwardfrom roblib import * 
-
+from roblib import * 
 
 fig = figure()
 ax = Axes3D(fig)
@@ -30,17 +29,25 @@ def draw_scene3D(ax, p, R, α, f):
     theta_left = -arctan2(f[1], f[0])
     draw_RUR(ax, R, p, α, theta_rear, theta_right, theta_left)
 
+# def pd(t):  
+#     return array([[4], [4], [10 + 0.1*sin(0.3*t)]])
 
 def pd(t):  
-    return array([[-3*t], [4], [5]])
+    return array([[-3*t], [0], [5]])
+
+# def dpd(t) :
+#     return array([[0.3*cos(0.3*t)],[-0.4*sin(0.4*t)],[0.03*cos(0.3*t)]])
 
 def dpd(t) :
     return array([[3],[0],[0]])
+# def ddpd(t) :
+#     return array([[-0.09*sin(0.3*t)],[-0.16*cos(0.4*t)],[-0.009*sin(0.3*t)]])
 
 def ddpd(t) :
     return array([[0],[0],[0]])
 
-def f_Rd(t):  return  expw([[sin(t)], [cos(2*t)], [t]])
+# def f_Rd(t):  return  expw([[sin(t)], [cos(2*t)], [t]])
+def f_Rd(t):  return  expw([[0], [0], [0]])
 def f_dRd(t): return (1/(2*dt))*(f_Rd(t+dt)-f_Rd(t-dt))
 def f_ddRd(t): return (1/(2*dt))*(f_dRd(t+dt)-f_dRd(t-dt))
 
@@ -89,14 +96,12 @@ inv_C = inv(C)
 def draw_platform(ax,pt,R):
     lz=5*l
     T = tran3H(*-pt)
-    T[1,3] = -T[1,3] 
     RH = ToH(R)
     M = T@RH@add1([[lz,-lz,-lz, lz,lz],[lz,lz,-lz,-lz,lz],[0,0,0,0,0]])
 
     # Corps du robot
-    T2 = tran3H(*-pt)
-    T2[1,3] = -T2[1,3] 
-    T2 = T2@ToH(R)
+    T2 = tran3H(*-pt) @ ToH(R)
+    
     M2 = T2@cylinder3H(1, 10)
     draw3H(ax,M2,'grey',False,-1)
 
@@ -135,10 +140,10 @@ f = 0.1*array([[1],[1],[1],[1],[1],[1]])
 for t in arange(0,20,dt):
     
     p, R, vr, wr,f = clock_RUR(p, R, vr, wr, f,t)
-    clean3D(ax, -50, 50, -50, 50, 0, 50)
-    ax.scatter(-3*t,4,5)
+    clean3D(ax, -20, 20, -20, 20, 0, 25)
+    ax.scatter(-3*t,0,5)
     draw_scene3D(ax, p, R, α, f)
-    draw_platform(ax, pd(t), f_Rd(t))
+    #draw_platform(ax, pd(t), f_Rd(t))
     α = α + dt * 30 * f
     pause(0.001)
 
