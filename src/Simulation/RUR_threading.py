@@ -1,3 +1,6 @@
+# ATTENTION CE PROGRAMME N'EST PAS TERMINÉ. IL N'EST DONC PAS FONCTIONNEL
+
+
 import threading
 from roblib import * 
 

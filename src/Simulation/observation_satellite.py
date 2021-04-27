@@ -189,7 +189,7 @@ for t in arange(0, 20, dt):
     ax.scatter(p[0, 0], p[1, 0], p[2, 0], c='red',
                marker='o')  # actual position
     ax.scatter(20, 0, 3,
-               c='green', marker='o')  # desired trajectory
+               c='green', marker='o') 
    
     Rd = f_Rd(ti)
   

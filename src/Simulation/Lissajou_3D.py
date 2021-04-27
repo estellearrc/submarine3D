@@ -106,7 +106,7 @@ def f_Rd(t):
     
     # Rdes = expw([[0],[0],[cap]])
 
-    return expm(pi * adjoint(array([[1], [0], [0]])))@R@expm((-pi/3)* adjoint(array([[0], [0], [1]])))#@expm((-pi/2 + pi/10)* adjoint(array([[0], [0], [1]])))
+    return expm(pi * adjoint(array([[1], [0], [0]])))@R@expm((-pi/3)* adjoint(array([[0], [0], [1]])))@expm((-pi/2 + pi/10)* adjoint(array([[0], [0], [1]])))
     #return eulermat(0, 0, 0)
 
 

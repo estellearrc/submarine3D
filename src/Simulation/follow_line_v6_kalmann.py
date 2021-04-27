@@ -1,6 +1,8 @@
 # Fifth version of the follow line algorithm
 # the lines parameters have been changed to length lk and rotation vector wk
 
+#CE PROGRAMME N'EST PAS LIÉ À NOTRE PROJET. SEULES CERTAINES ÉQUATIONS SONT INTÉRESSANTE À RÉUTILISER
+
 from roblib import *
 import pyibex as py
 import math
