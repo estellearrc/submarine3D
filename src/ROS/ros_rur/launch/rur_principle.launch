@@ -1,0 +1,17 @@
+<launch>
+	<group ns="uuv">
+		<!-- IMU -->
+
+		<node pkg="drivers" name = "imu" type="imu_driver_old.py" output="screen" />
+		<node pkg="drivers" name="gps_driver" type="gps_driver_old.py" output="screen" />
+		<node pkg="drivers" name = "esc" type="esc_driver.py" output="screen" />
+		<node pkg="drivers" name = "pap" type="pap_driver.py" output="screen" />
+		<node pkg="drivers" name = "pressure" type="pressure_driver.py" output="screen" />
+		<node pkg="control" name = "control" type="control.py" output="screen" />
+		<node pkg="control" name = "command" type="command.py" output="screen" />
+		<node pkg="communication" name = "com" type="comm.py" output="screen" />
+		<node pkg="communication" name = "camera" type="camera.py" output="screen" />
+		<node pkg="communication" name = "led" type="led.py" output="screen" />
+		<node pkg="communication" name = "sim" type="SIM.py" output="screen" />
+	</group>
+</launch>
